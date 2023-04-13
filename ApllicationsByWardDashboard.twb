@@ -808,7 +808,17 @@
           </metadata-record>
         </metadata-records>
       </connection>
+      <aliases enabled='yes' />
       <column datatype='integer' default-format='*00000' name='[Boundaries - ZIP Codes]' role='dimension' semantic-role='[ZipCode].[Name]' type='ordinal' />
+      <column caption='Days Spent Shooting' datatype='integer' name='[Calculation_492018274108416000]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='DATEDIFF(&apos;day&apos;, [Application Start Date],MAX([Application End Date],[Application Expired Date]))+1' />
+      </column>
+      <column caption='Fees Per Day' datatype='real' name='[Calculation_492018274109657089]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='([Total Fees]-ZN([Waived Fees]))/[Calculation_492018274108416000]' />
+      </column>
+      <column caption='Budget Category' datatype='string' name='[Calculation_492018274110423042]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='IF [Calculation_492018274109657089] &lt; 250 THEN &quot;Independent&quot; ELSE &quot;Big Budget&quot; END' />
+      </column>
       <column aggregation='Avg' datatype='real' name='[Latitude]' role='measure' semantic-role='[Geographical].[Latitude]' type='quantitative' />
       <column aggregation='Avg' datatype='real' name='[Longitude]' role='measure' semantic-role='[Geographical].[Longitude]' type='quantitative' />
       <column datatype='integer' name='[Number of Records]' role='measure' type='quantitative' user:auto-column='numrec' />
@@ -817,7 +827,7 @@
       <column datatype='integer' default-format='*00000' name='[Primary Contact Zip]' role='dimension' semantic-role='[ZipCode].[Name]' type='ordinal' />
       <column aggregation='Sum' datatype='integer' name='[Wards]' role='dimension' type='ordinal' />
       <column datatype='integer' default-format='*00000' name='[Zip Codes]' role='dimension' semantic-role='[ZipCode].[Name]' type='ordinal' />
-      <layout dim-ordering='alphabetic' dim-percentage='0.656171' measure-ordering='alphabetic' measure-percentage='0.343829' show-structure='true' />
+      <layout dim-ordering='alphabetic' dim-percentage='0.603275' measure-ordering='alphabetic' measure-percentage='0.396725' show-structure='true' />
       <semantic-values>
         <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
       </semantic-values>
@@ -950,6 +960,112 @@
       </table>
       <simple-id uuid='{AC6E4D30-2843-4B7F-AD38-FD7676ED5EF9}' />
     </worksheet>
+    <worksheet name='Big Budget vs Independent Movies by Year'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Chicago Filming Permits (Chicago Filming Dataset)' name='federated.0jej0qk1rre0a313mcmfr11xie5p' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0jej0qk1rre0a313mcmfr11xie5p'>
+            <column datatype='date' name='[Application End Date]' role='dimension' type='ordinal' />
+            <column datatype='date' name='[Application Expired Date]' role='dimension' type='ordinal' />
+            <column datatype='date' name='[Application Finalized Date]' role='dimension' type='ordinal' />
+            <column datatype='date' name='[Application Start Date]' role='dimension' type='ordinal' />
+            <column caption='Days Spent Shooting' datatype='integer' name='[Calculation_492018274108416000]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='DATEDIFF(&apos;day&apos;, [Application Start Date],MAX([Application End Date],[Application Expired Date]))+1' />
+            </column>
+            <column caption='Fees Per Day' datatype='real' name='[Calculation_492018274109657089]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='([Total Fees]-ZN([Waived Fees]))/[Calculation_492018274108416000]' />
+            </column>
+            <column caption='Budget Category' datatype='string' name='[Calculation_492018274110423042]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [Calculation_492018274109657089] &lt; 250 THEN &quot;Independent&quot; ELSE &quot;Big Budget&quot; END' />
+            </column>
+            <column datatype='integer' name='[Number of Records]' role='measure' type='quantitative' user:auto-column='numrec' />
+            <column datatype='integer' name='[Total Fees]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[Waived Fees]' role='measure' type='quantitative' />
+            <column-instance column='[Application Finalized Date]' derivation='Month' name='[mn:Application Finalized Date:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Calculation_492018274110423042]' derivation='None' name='[none:Calculation_492018274110423042:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Number of Records]' derivation='Sum' name='[sum:Number of Records:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Application Finalized Date]' derivation='Year' name='[yr:Application Finalized Date:ok]' pivot='key' type='ordinal' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.0jej0qk1rre0a313mcmfr11xie5p].[yr:Application Finalized Date:ok]'>
+            <groupfilter function='member' level='[yr:Application Finalized Date:ok]' member='2019' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+          </filter>
+          <slices>
+            <column>[federated.0jej0qk1rre0a313mcmfr11xie5p].[yr:Application Finalized Date:ok]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <color column='[federated.0jej0qk1rre0a313mcmfr11xie5p].[none:Calculation_492018274110423042:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0jej0qk1rre0a313mcmfr11xie5p].[sum:Number of Records:qk]</rows>
+        <cols>[federated.0jej0qk1rre0a313mcmfr11xie5p].[mn:Application Finalized Date:ok]</cols>
+      </table>
+      <simple-id uuid='{2D962D93-1971-42BD-83FF-5C7D258398A1}' />
+    </worksheet>
+    <worksheet name='Big Budget vs Independent Movies by Year (2)'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Chicago Filming Permits (Chicago Filming Dataset)' name='federated.0jej0qk1rre0a313mcmfr11xie5p' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0jej0qk1rre0a313mcmfr11xie5p'>
+            <column datatype='date' name='[Application End Date]' role='dimension' type='ordinal' />
+            <column datatype='date' name='[Application Expired Date]' role='dimension' type='ordinal' />
+            <column datatype='date' name='[Application Finalized Date]' role='dimension' type='ordinal' />
+            <column datatype='date' name='[Application Start Date]' role='dimension' type='ordinal' />
+            <column caption='Days Spent Shooting' datatype='integer' name='[Calculation_492018274108416000]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='DATEDIFF(&apos;day&apos;, [Application Start Date],MAX([Application End Date],[Application Expired Date]))+1' />
+            </column>
+            <column caption='Fees Per Day' datatype='real' name='[Calculation_492018274109657089]' role='measure' type='quantitative'>
+              <calculation class='tableau' formula='([Total Fees]-ZN([Waived Fees]))/[Calculation_492018274108416000]' />
+            </column>
+            <column caption='Budget Category' datatype='string' name='[Calculation_492018274110423042]' role='dimension' type='nominal'>
+              <calculation class='tableau' formula='IF [Calculation_492018274109657089] &lt; 250 THEN &quot;Independent&quot; ELSE &quot;Big Budget&quot; END' />
+            </column>
+            <column datatype='integer' name='[Number of Records]' role='measure' type='quantitative' user:auto-column='numrec' />
+            <column datatype='integer' name='[Total Fees]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[Waived Fees]' role='measure' type='quantitative' />
+            <column-instance column='[Application Finalized Date]' derivation='Month' name='[mn:Application Finalized Date:ok]' pivot='key' type='ordinal' />
+            <column-instance column='[Calculation_492018274110423042]' derivation='None' name='[none:Calculation_492018274110423042:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Number of Records]' derivation='Sum' name='[sum:Number of Records:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Application Finalized Date]' derivation='Year' name='[yr:Application Finalized Date:ok]' pivot='key' type='ordinal' />
+          </datasource-dependencies>
+          <filter class='categorical' column='[federated.0jej0qk1rre0a313mcmfr11xie5p].[yr:Application Finalized Date:ok]'>
+            <groupfilter function='member' level='[yr:Application Finalized Date:ok]' member='2019' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+          </filter>
+          <slices>
+            <column>[federated.0jej0qk1rre0a313mcmfr11xie5p].[yr:Application Finalized Date:ok]</column>
+          </slices>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+            <encodings>
+              <color column='[federated.0jej0qk1rre0a313mcmfr11xie5p].[none:Calculation_492018274110423042:nk]' />
+            </encodings>
+          </pane>
+        </panes>
+        <rows>[federated.0jej0qk1rre0a313mcmfr11xie5p].[sum:Number of Records:qk]</rows>
+        <cols>[federated.0jej0qk1rre0a313mcmfr11xie5p].[mn:Application Finalized Date:ok]</cols>
+      </table>
+      <simple-id uuid='{19B9F8FA-63C2-4B3F-A61B-237A503F0677}' />
+    </worksheet>
   </worksheets>
   <dashboards>
     <dashboard name='Dashboard 1'>
@@ -999,8 +1115,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='10' type='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98230' id='11' param='vert' type='layout-flow' w='99064' x='468' y='885'>
+            <zone h='100000' id='12' type='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98230' id='13' param='vert' type='layout-flow' w='99064' x='468' y='885'>
                 <zone fixed-size='280' h='98230' id='3' is-fixed='true' name='Applications by Ward Crosstab' w='44851' x='468' y='885'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -1141,7 +1257,7 @@
       </viewpoint>
       <simple-id uuid='{B8188C01-63A3-4842-AB8F-9719F8310E50}' />
     </window>
-    <window class='dashboard' maximized='true' name='Dashboard 1'>
+    <window class='dashboard' name='Dashboard 1'>
       <viewpoints>
         <viewpoint name='Application by Ward Map'>
           <zoom type='entire-view' />
@@ -1155,6 +1271,80 @@
       </viewpoints>
       <active id='9' />
       <simple-id uuid='{88211441-FEA1-4003-BD59-6EC9E6C8E88A}' />
+    </window>
+    <window class='worksheet' maximized='true' name='Big Budget vs Independent Movies by Year'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.0jej0qk1rre0a313mcmfr11xie5p].[none:Calculation_492018274110423042:nk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <zoom type='entire-view' />
+        <highlight>
+          <color-one-way>
+            <field>[federated.0jej0qk1rre0a313mcmfr11xie5p].[none:Calculation_492018274110423042:nk]</field>
+            <field>[federated.0jej0qk1rre0a313mcmfr11xie5p].[yr:Application Finalized Date:ok]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{870D834D-20F1-46AF-B14E-03FD6F22498E}' />
+    </window>
+    <window class='worksheet' name='Big Budget vs Independent Movies by Year (2)'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.0jej0qk1rre0a313mcmfr11xie5p].[none:Calculation_492018274110423042:nk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <zoom type='entire-view' />
+        <highlight>
+          <color-one-way>
+            <field>[federated.0jej0qk1rre0a313mcmfr11xie5p].[none:Calculation_492018274110423042:nk]</field>
+            <field>[federated.0jej0qk1rre0a313mcmfr11xie5p].[yr:Application Finalized Date:ok]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{91B52B5A-B2AE-48EF-8070-3BE32B6231DC}' />
     </window>
   </windows>
   <thumbnails>
@@ -2219,6 +2409,190 @@
       uN1ufD6fEO0DJElieHgYk8mEWq0+3ABMLWfoazXhC4Tofel1TPo0oWhc6EJyRSwWo6qqKie+
       6aampuyR4vuMJEmk02kKCwvJy8sjHA5z9erVnLVGFxVvSSaTmEwmotEo4XCY2tpa4SkcKpWK
       5uZmgsEgiUSC/x9R7T6nawb5vAAAAABJRU5ErkJggg==
+    </thumbnail>
+    <thumbnail height='192' name='Big Budget vs Independent Movies by Year' width='192'>
+      iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAA7DAAAOwwHHb6hk
+      AAASqUlEQVR4nO3dW2wc133H8e+Zy3KXy/tNlChKoihKsiU7ieMGaVw7N7dOHT/YcYsWCFq0
+      fSmCAjXQh/Ypz+1DkfQtQBH0pUBRpEmQxC7aJEjqxq7rxKmTyJJsySRFivc7d7nL3bmd04el
+      JDukbS65u0Ny/h+A4mpJzvwpnd/MnJlzZpQxxiBEQllxFyBEnCQAItEkACJ2P/3pq/z6kfjt
+      qSnW1tbe9V4ul9v2HsDk+A2uXL+57Ws7LQMMU7enWZgY4+VXf4qSPoCIk/FzfONfvs3Ihx9k
+      cSmHlUphaUM67dDZmmJ5IUdvbzu/uDmH461w+uKDNCufQuDiF5bI9gzi5ebo6DuNCjcJF97E
+      67zAtRvjnB/qp6M5y8ToKG3dnUwsFBg50UauZDHQnKL/Q4OyBxDxWpiaZeD++1kcvcambyjm
+      17Fsm/b2NpRSKKVYy5fo7+1mePgsSqnKDyro6R8k4yo6evq5fHEYBQydPsH88joDx3pob2sD
+      HeJjkWlu4UOXL6KNoaOjnebWNFd/Mbr/PYAx5l5RQuyRv5knclsJSnlaW9tpVJPadwCiKMK2
+      7VrVI0RDySGQSDQJgEg0CYBINAmASDQJgEg0CYBItF0FwOiIyYkJfL/MxO0ZSoUci6u5etcm
+      RN05u/mmKAzINCmW1j2UX2Z6JcQxGt3RitZ62zgOIQ6LXQUg2MwxOrVKf1eZXDGkNetSCMCy
+      LIwxciFMHFpyJVgkmnSCRaJJAESiSQBEokkARKJJAESiSQBEokkARKJJAESiSQBEokkARKJJ
+      AESiSQBEou1qNGjobTJ6a5Kenl6WVvP0dWTIe4ahwRP1rk+IutpVAOxUmo7WLCu5Iv3NLvPl
+      iBZl0FrLfABxqO0qAF5umfnVIse625heK9DdkaHgGZkPIA49mQ8gEk06wSLRJAAi0SQAItEk
+      ACLRJAAi0SQAItEkACLRJAAi0SQAItEkACLRJAAi0SQAItF2d3t0v8zt+RV62pqYnl+juzNL
+      0TMMnRqod31C1NWu5wOkXZvN4ial4iaFlgyuzAcQR8AuZ4QVmZubo6enm3STg4OmHMrzAcTh
+      J/MBRKJJJ1gkmgRAJJoEQCSaBEAkmgRAJJoEQCSaBEAkmgRAJJoEQCSaBEAkmgRAJJoEQCTa
+      rucDvH17jv6ODPO5Mi2OZsMz3Hd+uN71CVFXu54P0J7NkMvnCTeKFNp7yKZlPoA4/HY9H2B1
+      dZUTAycI9Bo97WkKvswHEIefzAcQiSadYJFoEgCRaBIAkWgSAJFoEgCRaBIAkWgSAJFoEgCR
+      aBIAkWgSAJFoEgCRaLsKgDEGz/MA8DyPKPApeX5dCxOiEXY1GtSEHrduz3HuVB8/f/06A8c6
+      KYeGCyPnMKYyLFqIw2h3h0CWjWUCpqdnicISXlQZCi3EYber4dBR6LO8skZ7Zze2MqAjvAha
+      mtMyHFocajIfQCSaHMeIRJMAiETbMQBeuczi4iIy1V0cdTsG4Pqv/o//fP4HlBtdjRANti0A
+      m7kV5lfy9B4/hnRtxVG3LQDN7d0MnzqO7TioOCoSooF2PAQqFfKkW9oaXYsQDbdjANq7ewjK
+      m4nYA5goQBeX4y5DxGTHsUA60mA4smeBjL9JNP8G4cRP0MujmNIqmae/hpXtibs00WA7BqBQ
+      8ulsbiIE3AYXVC/GKxBO/5xw7MeY3DR2/yXckSewHnmO8Ob3Cd96gdRH/yTuMkWD7RiAY91Z
+      roznaWp0NTVkjMFsrhBNvkI48TLG28A++TCpj3wRq2sYZd/71Z3hz1D63nO4H/4iyj4qkRe7
+      sWMAFpfnGb8yxaOf+g3S3JsP0JRyyBdKZDMp/BCaMwcrIsZoTGGJcPJloslXMP4mzqmP0/Sb
+      f4HqGESpnS98q1QW+9gloslXcM5+ssFVizhtC0BpfZGlnObCA2fvdoJN6DE5Pcdgfzczk1O4
+      LWl0YDg/Mhz/fACjMflporEXCSb/B9xmnKFPknrsr1HZ3nvfZioBeS/25WfxX/4K1pnfgkR0
+      /wXsEICV6VkC5TE3sc4jd95UNjrw2MjnSbW0YpkAHWcb0QHR8tuEt15Cz/0KK9uNc/oTZD73
+      d5Dp3NMirfYBlGWj129jdZyuccHioNo2HHozl6cMdLXfuw6gQ5/V9TzpdJpy2aOtrYUggmym
+      qWHDoU3koxeuE4z9CD1/Fat9EGfkceyBj6JS2ZqsI5x4mWjqZzQ9+lc1WZ44+LYFoLS+xAs/
+      fJHunhM8+ulHPvAsUD0DYPwi0czrhGM/RuemsHov4A4/jtV3AeU21359UUDpO18i89Q/oJpa
+      ar58cfBsOwTKdPRycWiAa2ONHw1qgk1McQW9Ok40+zrR8k3sngu4l5/F6r1Q9zM0ynZxhj9D
+      +PYPcC9/oa7rEgfDjjPCvNIGi6tFBgf6P3AB+90DGB0RTbxEMPojTG4G+9glnJHfxuq7iLJT
+      e17unusJSpW9wDP/iHIav37RWDueBh2/cQO77RgR1H1EqCnn0Ku3SD30R1idQ7Gfh1duBvvk
+      xwgnXsI999lYaxH19x4zwjyuvHaNoBEFNHeRevhPsXvOx97473AvPU14/bvy9MsE2DEAmWyW
+      klfe3U2DjiCr7QQ4afTKWNyliDrbFgBjDGurRbo600RxVHRAuA/8HsHVb8ZdhqizbQEob6yx
+      UfKxUk2JnhFmn3gIvTqOKefiLkXU0bYAZNq6aHYVjmWR5BseKtvBOfc4wc3vx12KqKMd+wCR
+      1mSzzYkfEeOef4Lw7R9idBh3KaJOdgxA/7E+lpZWjuyEmN1S6Xas7mGimdfjLkXUyc5ngVra
+      SNkq8QEAcC8/S3D1W3GXIepk25nO4voSb43eIpcv3H0v8stMzC7R15Fhcm6N3o4MG57h3JnB
+      hhYbB6v7HARldH4Oq+143OWIGtsWgMgvMzExycDpC3fPAtmpNM1NLrlCmYHWNPMBtNigtUZr
+      feQvGFkXPo939du4H/vzuEsRNbYtAM2dfTz55JMoZd09Pgq9IgsLCxzv72N2vUhvR4aCV3lG
+      gDHmyN8d2h5+jNIb/4ptQpSbjrscUUNye/Rd8l77Olb7IO75J+IuRdSQ3B16l9yLTxG8+fz7
+      TqsUh48EYJes1n5UUyt66UbcpYgakgBUIfXgH8gp0SNGAlAFq/8B9PptTGk97lJEjUgAqqAs
+      G2fkdwjeeiHuUkSNSACq5J7/HOH4f2OiRkwXEvUmAaiSamrB6j1PNCvjg44CCcAeuJeeIbjy
+      b3GXIWpAArAHVtcwmAidm4q7lH0zxhCEEWGUzOsbciV4j8LxF4nmrtD0yF82dL2R1vhBRBBq
+      grDyuRyElP0Qzw/Z9EJKXkDJCyj7ESU/oFQO8YLK+2Fk0MYQRZpQa6LI4DoW2hiyaZdLQ31c
+      HupjsK8N2zr628ekznvfN/vUJ/Bf/2eMv4lK7e8udQtrBV69NkPZD9j0Kg255AV4QYTWhkgb
+      Iq0JQo1lKVKOjetYdz+nUw4p1yHTtPWRculoSZNOuXffS6ccMk0ullI4toVtKeytz0optDas
+      bpR4c2KJF165ydzKBr0dWT58rp9LQ730tDej1NGbIiV7gH3wX/snVGs/7sUn97Wc9Y0yN6aW
+      yTRVGmzarTRW17WwrXuN1bEsLKsxjTAII+ZWCly9tci1W0vkimXOnujkIyP9nBvoorX5YN0a
+      fy/8IKouAAszk8zMr9PelaXsGS5dHEl0AHRhkfIPvkzmma+957MHjoqyH3Jrbp03xhd463bl
+      mWr3ne7lQ8PHON3fTpN7sA8mSl7A3EqBW3NrTC7kmF3eIIx0dYdAxoAyEZFK0ZLRiZkP8J7S
+      XaiWfoK5q1h998ddTV05FowMdDAy0AFcoFDyuTG1you/nGBqMU9L2uH+M708OHyM490tWDEe
+      Lm2WA+ZXC4zNrjE6s8pKvoQ2cLyrhaHjnTxyeZDjXVkyabe6PYBXKjAzv0pfdysFz9Df25Xo
+      PQBANPcrguvfI/3ZL8ddSmwirVnNl7g6vsiV8QUW1zYZ7Gvj8tk+7j/dS2drum79h1/fss8s
+      baAU9He1MDzQybmBLnram0mnnB1rkD7APhkdUfrOl0g/8bdY2e64yzkQ7vQfXr85x/XJJfwg
+      YvhEFw8M93FhsJtMU/W3wDTGsOkFzK9Utuxjs2ssrRUJtb67ZR8e6GSwr510avcHNhKAGgiu
+      fw9TXif10B/HXcqBtFkOGJtd45ej84zNrJJybS6d6eXy2WOcPtaOY2/vP+WLHjPLecZm17g9
+      n2Mpt4ltqV1v2XdLAlADxi9Sev45Mk9/7cDc4PegMsaQK3pcn1ji6q1FppfydLZkuDzUS8kP
+      GZ9dYyW3Scp1GOht5dxAF0PHO+ntaK5qy75bEoAa8V76CvbJh3GGHou7lEMl0prFtSLXbi2R
+      zaQYPtFJR0sa17Eact1BAlAjen0K7+WvknnqK3GXIqpwtE9eN5BqPwlKoddvx12KqIIEoEaU
+      Urj3P03whtxS/TCRANSQferjRAvXMV7hg79ZHAgSgBpStosz9Cjh+H/FXYrYJQlAjTn3yf2D
+      DhMJQI1Zzd1YbSfR81fjLkXsggSgDtwHvoAvneFDQQJQB1bfJUxxEV1cjrsU8QGquhC2sjDD
+      UiGg2QrIl+HyfcmeD/B+grf+HVNYIPXwn8VdingfVQ2uKBaLlNdyRF19tGSMzAd4H+r0Y/gv
+      PIf1wB+CnYq7HPEeqgrAwKnTaHuR3s4WCn5yng+wJ04r0cBDMPMznLOfirsa8R5kLFAd6dw0
+      3k/+nvRTXz2SE8qPAukE15FqGwDLRq/eirsU8R4kAHWklMJ94PcJrskt1Q8qCUCd2QMPo5du
+      yPigA0oCUGfKdnDOfprg5vfjLkXsQALQAO7FzxO+/X2MjuIuRfwaCUADqEwHVucZ9IKMDzpo
+      JAAN4l56Bl9uqX7gSAAaxOq9iCmtojfm4y5FvIMEoEHuTpl88/m4SxHvIAFoIGfoMaLb/4sJ
+      vbhLEVskAA2k3DT2wMOEEy/FXYrYUnUANjY28EtF1vJyYWcv3EvPEF77rkyZPCCqGg3qb+a5
+      +uYox/s6iSJDe0szWst/ZFWyfRi3mWh5DNV1Nu5qEq+qAKysrhJ4BTwvS2gqj9axLAsrAc+S
+      qqXU5S8QXvsWTZ/8m7hLSbyqAnD85BmOnTgFGLTm7hBfGepbHfvkR/Ff+zp4eVS6Pe5yEq3q
+      TXdli2/jODIHYK+U5eCMPE5w4z/iLiXx5NglJu753yUc+zFGh3GXkmgSgJiodBtW5xDR7C/j
+      LiXRJAAxci8/S3DlG3GXkWgSgBhZPSMQ+ej8XNylJJYEIEZKKZyLnye4/t24S0ksCUDMnDOP
+      Ek29iglKcZeSSHJblAPAf+ObBNe+g9V+EqvnHHbPBazO06j2k0f+CfRxkwAcAMYY0AGmuES0
+      +BZ6ZQy9PonJz4Kdwmrtx+oZweo6i9V5BtXaL8GoEQnAAWaMhijAbMwTLb+NXh1FL49iNldA
+      WZVAdJ3F7r2A6jyD1dwVd8mHjgTgEDJGQ+ih1yfRK+PolbfRa5OYcg6cJqyOU1g9I9hdw5U9
+      RqYj7pIPLAnAEWK0hrCMXptAL98kWh1Dr4xBUAI3U+lbdA1h9V7Aaj+JSmUbX2Pog4kg8it3
+      yYj8yoeOwLLBcsGywHJRdgpsB+xU3Q75qgqADj1mF9fp7chS8A3dHa0SgAPOGANGg7dBtHar
+      0r9YGUWvT0FQqlyR7h5GtZ5AKYWJAoi8yqGXDioNM/Qxkbf12qsM34j8d3xPeGdllXUpRWW0
+      5J0i7v4BtgvKRtlOpbFvNXJluWAiTBRW1hNtrefOuu40U6W4t2BVeWkMKKvyNWWhbBfspsq6
+      LBdl2eA0VdZhu+CkQDkoJ1VdAEqbReanZwlTLrbWnDlzhiiKZDj0oWQwWmPKOfTKaKXDraxK
+      g3RS9xqLZaPe2Zjsrfft1L3X1p1BxVuNU915DSi19UptNd69lnunmZqtPN37+7tfb/WbQh/0
+      nZBWAkXogw4xW3scE3nVDYfeWF0k74VkLcNmgMwHOOwsG1p6Kh8JVd0h0NYDMe40eMuy5BBI
+      HGpV7QFkay+OGmnNItEkACLRJAAi0SQAItEkACLRJAAi0SQAItEkACLRJAAi0fYUgLnpSW6M
+      TtS4FCEar6qhEHeE2DQ37WsagRAHwp72ANkmB632lB0hDpR9zQjTWu97PoAxJva7S++3hrh/
+      vhbi/h3i+vl9bcYty8IYs6/h0LX4xY0xsYZwv0PC97t+rTVKqVgbYNz/Bntd/77PAlXV8IzG
+      8/13vVWLLd9ulzE7NcHK+gYAvnfvQXX7raHa8BU38gSRZn19fdv6A8+j2mfu7LX+wkYerc27
+      l6FDyl71d6ze2wZIs76ep1zMUw7316fc6wbw/wH/cTEQxCIY/AAAAABJRU5ErkJggg==
+    </thumbnail>
+    <thumbnail height='192' name='Big Budget vs Independent Movies by Year (2)' width='192'>
+      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
     </thumbnail>
     <thumbnail height='192' name='Dashboard 1' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAA7DAAAOwwHHb6hk
